@@ -11,12 +11,35 @@ const haushaltsbuch = {
     EintragErfassen() {       
             let neuerEintrag = new Map();
 
-            neuerEintrag.set("Titel", prompt("Titel:", "Miete"));
-            neuerEintrag.set("Typ", prompt("Typ (Einnahme oder Ausgabe):", "Einnahme"));
-            neuerEintrag.set("Betrag", parseInt(prompt("Betrag (in Cent):")));
-            neuerEintrag.set("Datum", prompt("Datum:", "jjjj-mm-tt"));
+            neuerEintrag.set("Titel", prompt("Titel:", "Miete")).trim();
+            neuerEintrag.set("Typ", prompt("Typ (Einnahme oder Ausgabe):", "Einnahme")).trim();
+            neuerEintrag.set("Betrag", this.BetragVerarbeiten(parseInt(prompt("Betrag (in Euro, ohne €-Zeichen):")))).trim();
+            neuerEintrag.set("Datum", new Date(prompt("Datum:", "jjjj-mm-tt"))).trim();
+            neuerEintrag.set("timestamp", Date.now());
             this.eintraege.push(neuerEintrag);
-            },
+            },          
+     
+    BetragValidieren(betrag) {
+        if (betrag.math(/^\d+(?:(?:,|\.)\d\d?)?$/) != null)     // Regex für beliebige Zahl mit oder ohne zwei Kommastellen
+        {
+            return true;
+        }
+        else 
+        {
+            return false
+        }
+    }        
+    
+    BetragVerarbeiten(betrag) {
+        if(this.BetragValidieren(betrag)) 
+        {
+            return parseFloat(betrag.replace(",", ".")) * 100;
+        }
+        else {
+            console.log(`Ungültiger Betrag: ${betrag} €`)
+        }       
+    },
+
 
     // Einträge sortieren
     EintraegeSortieren() {
@@ -39,8 +62,13 @@ const haushaltsbuch = {
             this.eintraege.forEach(function(eintrag) {
                 console.log(`Titel: ${eintrag.get("Titel")}\n`
                     + `Typ: ${eintrag.get("Typ")}\n`
-                    + `Betrag: ${eintrag.get("Betrag")} ct\n`
-                    + `Datum: ${eintrag.get("Datum")}`);
+                    + `Betrag: ${(eintrag.get("Betrag") / 100).toFixed(2)} €\n`
+                    + `Datum: ${eintrag.get("Datum").toLocaleDateString("de-DE", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit" 
+                    })}`
+                );
             });
     },
 
@@ -73,9 +101,9 @@ const haushaltsbuch = {
     // // Gesamtbilanz ausgeben
     GesamtbilanzAusgeben() {
 
-    console.log(`Einnahmen: ${this.gesamtbilanz.get("Einnahmen")} ct\n`
-                + `Ausgaben: ${this.gesamtbilanz.get("Ausgaben")} ct\n`
-                + `Bilanz: ${this.gesamtbilanz.get("Bilanz")} ct\n`
+    console.log(`Einnahmen: ${(this.gesamtbilanz.get("Einnahmen" / 100)).toFixed(2)} €\n`
+                + `Ausgaben: ${(this.gesamtbilanz.get("Ausgaben")).toFixed(2)} €\n`
+                + `Bilanz: ${(this.gesamtbilanz.get("Bilanz")).toFixed(2)} €\n`
                 + `Bilanz ist positiv: ${this.gesamtbilanz.bilanz >= 0}`);
     },
 
