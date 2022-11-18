@@ -1,6 +1,6 @@
 "use strict";
 
-// Noramel Funktion:
+// Normale Funktion:
 // const multiplizieren = function(a, b) {return a * b; };
 // const multiplizieren = (a, b) => {return a * b; };
 
